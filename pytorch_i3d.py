@@ -329,6 +329,19 @@ class InceptionI3d(nn.Module):
             logits = x.squeeze(3).squeeze(3)
         # logits is batch X time X classes, which is what we want to work with
         return logits
+    
+    def extract_features_and_logits(self, x):
+        for end_point in self.VALID_ENDPOINTS:
+            if end_point in self.end_points:
+                x = self._modules[end_point](x)
+        features = self.avg_pool(x)
+        
+        
+        x = self.logits(self.dropout(features))
+        if self._spatial_squeeze:
+            logits = x.squeeze(3).squeeze(3)
+            
+        return features,logits
         
 
     def extract_features(self, x):
